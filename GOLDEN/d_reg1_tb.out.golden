@@ -1,0 +1,10 @@
+// memory data file (do not edit the following line - required for mem load use)
+// instance=/REG1_TB/result
+// format=hex addressradix=h dataradix=h version=1.0 wordsperline=1 noaddress
+00000022
+00000023
+0000000b
+0000002f
+0000001d
+0000001f
+00000023

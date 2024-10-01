@@ -1,0 +1,17 @@
+// memory data file (do not edit the following line - required for mem load use)
+// instance=/SR_LATCH_TB/result
+// format=hex addressradix=h dataradix=h version=1.0 wordsperline=1 noaddress
+00000042
+00000043
+00000047
+0000004b
+0000004f
+00000021
+00000023
+00000027
+0000002b
+0000002f
+0000005b
+00000053
+00000037
+00000033
