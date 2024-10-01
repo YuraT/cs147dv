@@ -29,7 +29,21 @@ input [63:0] A;
 input [63:0] B;
 input SnA;
 
-// TBD
+// carry-in bits for each 1-bit full adder
+wire C[0:64];
+buf (C[0], SnA);
+
+genvar i;
+generate
+    for (i = 0; i < 64; i = i + 1)
+    begin : add64_gen_loop
+        wire B_xor;
+        xor (B_xor, B[i], SnA);
+        FULL_ADDER add64_inst(Y[i], C[i+1], A[i], B_xor, C[i]);
+    end
+endgenerate
+
+buf (CO, C[64]);
 
 endmodule
 
@@ -42,7 +56,20 @@ input [`DATA_INDEX_LIMIT:0] A;
 input [`DATA_INDEX_LIMIT:0] B;
 input SnA;
 
-// TBD
+// carry-in bits for each 1-bit full adder
+wire C[0:32];
+buf (C[0], SnA);
+
+genvar i;
+generate
+    for (i = 0; i < 32; i = i + 1)
+    begin : add32_gen_loop
+        wire B_xor;
+        xor (B_xor, B[i], SnA);
+        FULL_ADDER add32_inst(Y[i], C[i+1], A[i], B_xor, C[i]);
+    end
+endgenerate
+
+buf (CO, C[32]);
 
 endmodule
-

@@ -23,6 +23,9 @@ module FULL_ADDER(S,CO,A,B, CI);
 output S,CO;
 input A,B, CI;
 
-//TBD
+wire Y, CO1, CO2;
+HALF_ADDER ha1(.Y(Y), .C(CO1), .A(A), .B(B));
+HALF_ADDER ha2(.Y(S), .C(CO2), .A(Y), .B(CI));
+or (CO, CO1, CO2);
 
-endmodule;
+endmodule

@@ -22,6 +22,7 @@ module HALF_ADDER(Y,C,A,B);
 output Y,C;
 input A,B;
 
-// TBD
+xor digit(Y, A, B);
+and carry(C, A, B);
 
-endmodule;
+endmodule
