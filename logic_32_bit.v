@@ -22,8 +22,13 @@ output [31:0] Y;
 input [31:0] A;
 input [31:0] B;
 
-// TBD
-
+genvar i;
+generate
+    for (i = 0; i < 32; i = i + 1)
+    begin : nor32_gen_loop
+        nor nor_inst(Y[i], A[i], B[i]);
+    end
+endgenerate
 endmodule
 
 // 32-bit AND
@@ -34,8 +39,13 @@ output [31:0] Y;
 input [31:0] A;
 input [31:0] B;
 
-// TBD
-
+genvar i;
+generate
+    for (i = 0; i < 32; i = i + 1)
+    begin : and32_gen_loop
+        and and_inst(Y[i], A[i], B[i]);
+    end
+endgenerate
 endmodule
 
 // 32-bit inverter
@@ -45,8 +55,13 @@ output [31:0] Y;
 //input
 input [31:0] A;
 
-// TBD
-
+genvar i;
+generate
+    for (i = 0; i < 32; i = i + 1)
+    begin : inv32_gen_loop
+        not inv32_inst(Y[i], A[i]);
+    end
+endgenerate
 endmodule
 
 // 32-bit OR
@@ -57,6 +72,11 @@ output [31:0] Y;
 input [31:0] A;
 input [31:0] B;
 
-// TBD
-
+genvar i;
+generate
+    for (i = 0; i < 32; i = i + 1)
+    begin : or32_gen_loop
+        or or32_inst(Y[i], A[i], B[i]);
+    end
+endgenerate
 endmodule
