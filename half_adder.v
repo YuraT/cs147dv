@@ -22,6 +22,12 @@ module HALF_ADDER(Y,C,A,B);
 output Y,C;
 input A,B;
 
-// TBD
+// this
+assign Y = A ^ B;
+assign C = A & B;
 
-endmodule;
+// or this
+//xor digit(Y, A, B);
+//and carry(C, A, B);
+
+endmodule

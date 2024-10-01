@@ -42,7 +42,24 @@ input [`DATA_INDEX_LIMIT:0] A;
 input [`DATA_INDEX_LIMIT:0] B;
 input SnA;
 
-// TBD
+//wire C0, C1, C2, C3;
+//assign C0 = SnA;
+//FULL_ADDER b0(Y[0], C1, A[0], B[0], C0);
+
+// module FULL_ADDER(S,CO,A,B, CI);
+
+// carry-in bits for each 1 bit full adder
+wire C[0:32];
+assign C[0] = SnA;
+
+genvar i;
+generate
+    for (i = 0; i < 32; i = i + 1)
+    begin : add32_gen_loop
+        FULL_ADDER add_inst(Y[i], C[i+1], A[i], B[i] ^ SnA, C[i]);
+    end
+endgenerate
+
+assign CO = C[32];
 
 endmodule
-
