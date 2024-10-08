@@ -27,7 +27,25 @@ output [31:0] LO;
 input [31:0] A;
 input [31:0] B;
 
-// TBD
+wire [31:0] A_neg, B_neg;
+TWOSCOMP32 A_twoscomp(A_neg, A);
+TWOSCOMP32 B_twoscomp(B_neg, B);
+
+wire [31:0] A_abs, B_abs;
+MUX32_2x1 A_mux(A_abs, A, A_neg, A[31]);
+MUX32_2x1 B_mux(B_abs, B, B_neg, B[31]);
+
+wire [31:0] HI_abs, LO_abs;
+MULT32_U mult_abs(HI_abs, LO_abs, A_abs, B_abs);
+
+wire [31:0] HI_neg, LO_neg;
+TWOSCOMP64 mult_neg({HI_neg,LO_neg}, {HI_abs,LO_abs});
+
+wire sign;
+xor (sign, A[31], B[31]);
+
+MUX32_2x1 HI_mux(HI, HI_abs, HI_neg, sign);
+MUX32_2x1 LO_mux(LO, LO_abs, LO_neg, sign);
 
 endmodule
 
@@ -69,19 +87,7 @@ generate
     end
 endgenerate
 
-// last partial is HI
-
-// multiply A by a most significant digit in B
-//wire [31:0] A_and;
-//AND32_2x1 partial32_and(A_and, A, {32{B[31]}});
-
-// calc HI
-//RC_ADD_SUB_32 partial32_add(.Y(HI), .A(A_and), .B({CI[30],Y[30][31:1]}), .SnA(1'b0));
-
-// put lowest bit from calc into result
-//buf (LO[31], HI[0]);
-
-// last partial is HI
+// last carry and partial is HI
 BUF32_1x1 buf_hi(HI, {CI[31],Y[31][31:1]});
 
 endmodule
