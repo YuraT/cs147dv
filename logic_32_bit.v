@@ -80,3 +80,19 @@ generate
     end
 endgenerate
 endmodule
+
+// 32-bit buffer
+module BUF32_1x1(Y,A);
+//output 
+output [31:0] Y;
+//input
+input [31:0] A;
+
+genvar i;
+generate
+    for (i = 0; i < 32; i = i + 1)
+    begin : buf32_gen_loop
+        buf buf32_inst(Y[i], A[i]);
+    end
+endgenerate
+endmodule
