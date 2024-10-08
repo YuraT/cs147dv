@@ -102,7 +102,20 @@ input [31:0] I0;
 input [31:0] I1;
 input S;
 
-// TBD
+// only need 1 not gate
+not (S_not, S);
+
+wire [31:0] x0, x1;
+
+genvar i;
+generate
+    for (i = 0; i < 32; i = i + 1)
+    begin : mux32_gen_loop
+        and (x0[i], S_not, I0[i]);
+        and (x1[i], S, I1[i]);
+        or (Y[i], x0[i], x1[i]);
+    end
+endgenerate
 
 endmodule
 
@@ -113,6 +126,9 @@ output Y;
 //input list
 input I0, I1, S;
 
-// TBD
+not (S_not, S);
+and (x0, S_not, I0);
+and (x1, S, I1);
+or (Y, x0, x1);
 
 endmodule
