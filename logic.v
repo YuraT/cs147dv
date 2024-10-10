@@ -141,6 +141,12 @@ output [3:0] D;
 // input
 input [1:0] I;
 
-// TBD
+wire I_not [1:0];
+not I_inv[1:0] (I_not, I);
+
+and (D[0], I_not[1], I_not[0]);
+and (D[1], I_not[1], I[0]);
+and (D[2], I[1], I_not[0]);
+and (D[3], I[1], I[0]);
 
 endmodule

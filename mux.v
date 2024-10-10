@@ -55,7 +55,11 @@ input [31:0] I14;
 input [31:0] I15;
 input [3:0] S;
 
-// TBD
+
+wire [31:0] x0, x1;
+MUX32_8x1 mux8_0(x0, I0, I1, I2, I3, I4, I5, I6, I7, S[2:0]);
+MUX32_8x1 mux8_1(x1, I8, I9, I10, I11, I12, I13, I14, I15, S[2:0]);
+MUX32_2x1 out(Y, x0, x1, S[3]);
 
 endmodule
 
@@ -74,7 +78,10 @@ input [31:0] I6;
 input [31:0] I7;
 input [2:0] S;
 
-// TBD
+wire [31:0] x0, x1;
+MUX32_4x1 mux4_0(x0, I0, I1, I2, I3, S[1:0]);
+MUX32_4x1 mux4_1(x1, I4, I5, I6, I7, S[1:0]);
+MUX32_2x1 out(Y, x0, x1, S[2]);
 
 endmodule
 
@@ -89,7 +96,31 @@ input [31:0] I2;
 input [31:0] I3;
 input [1:0] S;
 
-// TBD
+// wire [3:0] x;
+// DECODER_2x4 d(x, S);
+//
+// genvar i;
+// generate
+//     for (i = 0; i < 32; i = i + 1) begin : mux32_4x1_gen
+//         // enabling circuit
+//         wire [3:0] o;
+//         and and0_inst(o[0], x[0], I0[i]);
+//         and and1_inst(o[1], x[1], I1[i]);
+//         and and2_inst(o[2], x[2], I2[i]);
+//         and and3_inst(o[3], x[3], I3[i]);
+//
+//         // combining gate
+//         wire [1:0] p;
+//         or or0(p[0], o[0], o[1]);
+//         or or1(p[1], o[2], o[3]);
+//         or out(Y[i], p[0], p[1]);
+//     end
+// endgenerate
+
+wire [31:0] x0, x1;
+MUX32_2x1 mux2_0(x0, I0, I1, S[0]);
+MUX32_2x1 mux2_1(x1, I2, I3, S[0]);
+MUX32_2x1 out(Y, x0, x1, S[1]);
 
 endmodule
 
@@ -103,17 +134,19 @@ input [31:0] I1;
 input S;
 
 // only need 1 not gate
+wire S_not;
 not (S_not, S);
 
-wire [31:0] x0, x1;
+// wire [31:0] x0, x1;
 
 genvar i;
 generate
     for (i = 0; i < 32; i = i + 1)
     begin : mux32_gen_loop
-        and (x0[i], S_not, I0[i]);
-        and (x1[i], S, I1[i]);
-        or (Y[i], x0[i], x1[i]);
+        wire x0, x1;
+        and (x0, S_not, I0[i]);
+        and (x1, S, I1[i]);
+        or (Y[i], x0, x1);
     end
 endgenerate
 
@@ -126,6 +159,7 @@ output Y;
 //input list
 input I0, I1, S;
 
+wire S_not, x0, x1;
 not (S_not, S);
 and (x0, S_not, I0);
 and (x1, S, I1);
