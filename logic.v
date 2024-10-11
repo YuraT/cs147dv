@@ -56,7 +56,10 @@ input D, C, L;
 input nP, nR;
 output Q,Qbar;
 
-// TBD
+wire D_out;
+MUX1_2x1 data(D_out, Q, D, L);
+
+D_FF dff(Q, Qbar, D_out, C, nP, nR);
 
 endmodule
 
@@ -69,7 +72,11 @@ input D, C;
 input nP, nR;
 output Q,Qbar;
 
-// TBD
+wire Cbar, Y, Ybar;
+not C_inv(Cbar, C);
+D_LATCH dlatch(Y, Ybar, D, Cbar, nP, nR);
+
+SR_LATCH srlatch(Q, Qbar, Y, Ybar, C, nP, nR);
 
 endmodule
 
@@ -82,7 +89,10 @@ input D, C;
 input nP, nR;
 output Q,Qbar;
 
-// TBD
+wire Dbar;
+not D_inv(Dbar, D);
+
+SR_LATCH latch(Q, Qbar, D, Dbar, C, nP, nR);
 
 endmodule
 
@@ -95,7 +105,13 @@ input S, R, C;
 input nP, nR;
 output Q,Qbar;
 
-// TBD
+wire r1, r2;
+
+nand n1(r1, C, S);
+nand n2(r2, C, R);
+
+nand n3(Q, nP, r1, Qbar);
+nand n4(Qbar, nR, r2, Q);
 
 endmodule
 

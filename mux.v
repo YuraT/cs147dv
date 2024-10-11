@@ -96,27 +96,6 @@ input [31:0] I2;
 input [31:0] I3;
 input [1:0] S;
 
-// wire [3:0] x;
-// DECODER_2x4 d(x, S);
-//
-// genvar i;
-// generate
-//     for (i = 0; i < 32; i = i + 1) begin : mux32_4x1_gen
-//         // enabling circuit
-//         wire [3:0] o;
-//         and and0_inst(o[0], x[0], I0[i]);
-//         and and1_inst(o[1], x[1], I1[i]);
-//         and and2_inst(o[2], x[2], I2[i]);
-//         and and3_inst(o[3], x[3], I3[i]);
-//
-//         // combining gate
-//         wire [1:0] p;
-//         or or0(p[0], o[0], o[1]);
-//         or or1(p[1], o[2], o[3]);
-//         or out(Y[i], p[0], p[1]);
-//     end
-// endgenerate
-
 wire [31:0] x0, x1;
 MUX32_2x1 mux2_0(x0, I0, I1, S[0]);
 MUX32_2x1 mux2_1(x1, I2, I3, S[0]);
