@@ -43,7 +43,12 @@ input CLK, LOAD;
 input [31:0] D;
 input RESET;
 
-// TBD
+genvar i;
+generate
+    for (i = 0; i < 32; i = i + 1) begin : reg_gen
+        REG1 r(Q[i], _, D[i], LOAD, CLK, 1'b1, RESET);
+    end
+endgenerate
 
 endmodule
 
@@ -122,7 +127,19 @@ output [31:0] D;
 // input
 input [4:0] I;
 
-// TBD
+wire [15:0] half;
+wire I_not;
+not I_inv(I_not, I[4]);
+
+DECODER_4x16 d(half, I[3:0]);
+
+genvar i;
+generate
+    for (i = 0; i < 16; i = i + 1) begin : d5_gen
+        and msb0(D[i], I_not, half[i]);
+        and msb1(D[i + 16], I[4], half[i]);
+    end
+endgenerate
 
 endmodule
 
@@ -133,7 +150,19 @@ output [15:0] D;
 // input
 input [3:0] I;
 
-// TBD
+wire [7:0] half;
+wire I_not;
+not I_inv(I_not, I[3]);
+
+DECODER_3x8 d(half, I[2:0]);
+
+genvar i;
+generate
+    for (i = 0; i < 8; i = i + 1) begin : d4_gen
+        and msb0(D[i], I_not, half[i]);
+        and msb1(D[i + 8], I[3], half[i]);
+    end
+endgenerate
 
 
 endmodule
@@ -145,8 +174,19 @@ output [7:0] D;
 // input
 input [2:0] I;
 
-//TBD
+wire [3:0] half;
+wire I_not;
+not I_inv(I_not, I[2]);
 
+DECODER_2x4 d(half, I[1:0]);
+
+genvar i;
+generate
+    for (i = 0; i < 4; i = i + 1) begin : d3_gen
+        and msb0(D[i], I_not, half[i]);
+        and msb1(D[i + 4], I[2], half[i]);
+    end
+endgenerate
 
 endmodule
 

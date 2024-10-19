@@ -27,7 +27,16 @@ input [31:0] I16, I17, I18, I19, I20, I21, I22, I23;
 input [31:0] I24, I25, I26, I27, I28, I29, I30, I31;
 input [4:0] S;
 
-// TBD
+wire [31:0] x0, x1;
+MUX32_16x1 mux16_0(x0, I0, I1, I2, I3, I4, I5, I6, I7,
+                       I8, I9, I10, I11, I12, I13, I14, I15,
+                       S[3:0]
+);
+MUX32_16x1 mux16_1(x1, I16, I17, I18, I19, I20, I21, I22, I23,
+                       I24, I25, I26, I27, I28, I29, I30, I31,
+                       S[3:0]
+);
+MUX32_2x1 out(Y, x0, x1, S[4]);
 
 endmodule
 
