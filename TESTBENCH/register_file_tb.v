@@ -68,24 +68,43 @@ no_of_pass = 0;
 // Write cycle
 for(i=0;i<32; i = i + 1)
 begin
-#10     DATA_REG=i; READ=1'b0; WRITE=1'b1; ADDR_W = i;
+#10     DATA_REG = i * 10; READ=1'b0; WRITE=1'b1; ADDR_W = i;
 end
 
 #5 READ=1'b0; WRITE=1'b0;
 // test of write data
 for(i=0;i<32; i = i + 1)
 begin
-#5      READ=1'b1; WRITE=1'b0; ADDR_R1 = i; ADDR_R2 = i;
+#5      READ=1'b1; WRITE=1'b0; ADDR_R1 = i; ADDR_R2 = i % 7;
 #5      no_of_test = no_of_test + 1;
-        if (DATA_R1 !== i)
-	    $write("[TEST @ %0dns] Read %1b, Write %1b, expecting %8h, got %8h [FAILED]\n", $time, READ, WRITE, i, DATA_R1);
-        else 
+        if (DATA_R1 !== i * 10)
+	    $write("[TEST @ %0dns] Read %1b, Write %1b, expecting %8h, got %8h [FAILED]\n", $time, READ, WRITE, i * 10, DATA_R1);
+        else if (DATA_R2 !== (i % 7) * 10)
+	    $write("[TEST @ %0dns] Read %1b, Write %1b, expecting %8h, got %8h [FAILED]\n", $time, READ, WRITE, (i % 7) * 10, DATA_R2);
+        else
 	    no_of_pass  = no_of_pass + 1;
         result[ridx] = DATA_R1; ridx=ridx+1;
         result[ridx] = DATA_R1; ridx=ridx+1;
         
 end
 
+// Testing read and write at the same time
+for(i=2;i<16; i = i + 1)
+begin
+#5      DATA_REG = 20; READ=1'b1; WRITE=1'b1; ADDR_W = i + 1; ADDR_R1 = i; ADDR_R2 = i * 2;
+#5      no_of_test = no_of_test + 1;
+        if (DATA_R1 !== 20)
+	    $write("[TEST @ %0dns] Read %1b, Write %1b, expecting %8h, got %8h [FAILED]\n", $time, READ, WRITE, 20, DATA_R1);
+        else if (DATA_R2 !== i * 20)
+	    $write("[TEST @ %0dns] Read %1b, Write %1b, expecting %8h, got %8h [FAILED]\n", $time, READ, WRITE, i * 20, DATA_R2);
+        else
+	    no_of_pass  = no_of_pass + 1;
+        result[ridx] = DATA_R1; ridx=ridx+1;
+        result[ridx] = DATA_R1; ridx=ridx+1;
+
+end
+
+// TODO: Read and write from the same address at the same time?
 
 #5    READ=1'b0; WRITE=1'b0; // No op
 
