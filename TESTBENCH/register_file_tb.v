@@ -84,7 +84,6 @@ begin
         else
 	    no_of_pass  = no_of_pass + 1;
         result[ridx] = DATA_R1; ridx=ridx+1;
-        result[ridx] = DATA_R1; ridx=ridx+1;
         
 end
 
@@ -100,9 +99,19 @@ begin
         else
 	    no_of_pass  = no_of_pass + 1;
         result[ridx] = DATA_R1; ridx=ridx+1;
-        result[ridx] = DATA_R1; ridx=ridx+1;
 
 end
+
+// Test reading when READ=0
+#5     READ=1'b0;
+#5     no_of_test = no_of_test + 1;
+if (DATA_R1 !== 32'bx)
+        $write("[TEST @ %0dns] READ=0, expecting DATA_R1 to be 32{x}, got %8h [FAILED]\n", $time, DATA_R1);
+else if (DATA_R2 !== 32'bx)
+        $write("[TEST @ %0dns] READ=0, expecting DATA_R2 to be 32{x}, got %8h [FAILED]\n", $time, DATA_R2);
+else
+no_of_pass  = no_of_pass + 1;
+result[ridx] = DATA_R1; ridx=ridx+1;
 
 // TODO: Read and write from the same address at the same time?
 
