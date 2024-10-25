@@ -114,6 +114,7 @@ no_of_pass  = no_of_pass + 1;
 result[ridx] = DATA_R1; ridx=ridx+1;
 
 // TODO: Read and write from the same address at the same time?
+// TODO: Write when WRITE=0 should be tested
 
 #5    READ=1'b0; WRITE=1'b0; // No op
 

@@ -42,8 +42,11 @@ output [`DATA_INDEX_LIMIT:0] DATA_R1;
 output [`DATA_INDEX_LIMIT:0] DATA_R2;
 
 wire [31:0] Q [31:0];
-wire [31:0] r_write;
-DECODER_5x32 d_write(r_write, ADDR_W);
+wire [31:0] r_write_sel, r_write;
+DECODER_5x32 d_write(r_write_sel, ADDR_W);
+
+// only write when WRITE=1
+and write_active [31:0] (r_write, r_write_sel, WRITE);
 
 REG32 r[31:0] (Q, DATA_W, r_write, CLK, RST);
 
