@@ -20,7 +20,7 @@ output [63:0] Y;
 //input list
 input [63:0] A;
 
-RC_ADD_SUB_64 twoscomp64_sub(.Y(Y), .A(64'b0), .B(A), .SnA(1'b1));
+RC_ADD_SUB_64 twoscomp64_sub(.Y(Y), .CO(), .A(64'b0), .B(A), .SnA(1'b1));
 
 endmodule
 
@@ -31,7 +31,7 @@ output [31:0] Y;
 //input list
 input [31:0] A;
 
-RC_ADD_SUB_32 twoscomp32_sub(.Y(Y), .A(0), .B(A), .SnA(1'b1));
+RC_ADD_SUB_32 twoscomp32_sub(.Y(Y), .CO(), .A(0), .B(A), .SnA(1'b1));
 
 endmodule
 

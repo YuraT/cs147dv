@@ -44,7 +44,7 @@ wire [31:0] res,
 // can use oprn[1] or oprn[3] for SnA
 wire SnA;
 or (SnA, OPRN[1], OPRN[3]);
-RC_ADD_SUB_32 addsub(.Y(res_addsub), .A(OP1), .B(OP2), .SnA(SnA));
+RC_ADD_SUB_32 addsub(.Y(res_addsub), .CO(), .A(OP1), .B(OP2), .SnA(SnA));
 buf slt [31:0] (res_slt, {31'b0,res_addsub[31]});
 
 // shift_r = xx0100
@@ -54,7 +54,7 @@ buf slt [31:0] (res_slt, {31'b0,res_addsub[31]});
 SHIFT32 shift(res_shift, OP1, OP2, OPRN[0]);
 
 // mul = xx0011
-MULT32 mul(.LO(res_mul), .A(OP1), .B(OP2));
+MULT32 mul(.LO(res_mul), .HI(), .A(OP1), .B(OP2));
 
 // and = xx0110
 // or  = xx0111
@@ -63,11 +63,12 @@ AND32_2x1 and32(res_and, OP1, OP2);
 OR32_2x1 or32(res_or, OP1, OP2);
 NOR32_2x1 nor32(res_nor, OP1, OP2);
 
-MUX32_16x1 out(.Y(res), .S(OPRN[3:0]),
+MUX32_16x1 out(.Y(res), .S(OPRN[3:0]), .I0(),
                .I1(res_addsub), .I2(res_addsub), .I3(res_mul),
                .I4(res_shift),.I5(res_shift),
                .I6(res_and), .I7(res_or), .I8(res_nor),
-               .I9(res_slt)
+               .I9(res_slt),
+               .I10(), .I11(), .I12(), .I13(), .I14(), .I15()
 );
 
 // or bits of result for zero flag
