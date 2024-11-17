@@ -13,6 +13,23 @@
 //  1.0     Sep 02, 2014	Kaushik Patra	kpatra@sjsu.edu		Initial creation
 //------------------------------------------------------------------------------------------
 //
+
+// 32-bit D latch
+module D_LATCH32(Q, D, LOAD, RESET);
+output [31:0] Q;
+
+input LOAD;
+input [31:0] D;
+input RESET;
+
+genvar i;
+generate
+    for (i = 0; i < 32; i = i + 1) begin : d_latch_gen
+        D_LATCH d_latch_inst(Q[i], _, D[i], LOAD, 1'b1, RESET);
+    end
+endgenerate
+endmodule
+
 // 64-bit two's complement
 module TWOSCOMP64(Y,A);
 //output list
@@ -56,7 +73,6 @@ generate
               REG1 reg_inst(.Q(Q[i]), .Qbar(qbar[i]), .D(D[i]), .L(LOAD), .C(CLK), .nP(RESET), .nR(1'b1));
     end
 endgenerate
-
 endmodule
 
 // 32-bit registere +ve edge, Reset on RESET=0
@@ -73,7 +89,6 @@ generate
         REG1 r(Q[i], _, D[i], LOAD, CLK, 1'b1, RESET);
     end
 endgenerate
-
 endmodule
 
 // 1 bit register +ve edge, 
@@ -164,7 +179,6 @@ generate
         and msb1(D[i + 16], I[4], half[i]);
     end
 endgenerate
-
 endmodule
 
 // 4x16 Line decoder
@@ -187,8 +201,6 @@ generate
         and msb1(D[i + 8], I[3], half[i]);
     end
 endgenerate
-
-
 endmodule
 
 // 3x8 Line decoder
@@ -211,7 +223,6 @@ generate
         and msb1(D[i + 4], I[2], half[i]);
     end
 endgenerate
-
 endmodule
 
 // 2x4 Line decoder

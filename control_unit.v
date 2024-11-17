@@ -215,12 +215,11 @@ always @ (state) begin
 
             // loaded in previous state, set to 0
             C[`pc_load] = 1'b0;
+            C[`ir_load] = 1'b0;
             C[`sp_load] = 1'b0;
             C[`reg_r] = 1'b0;
             C[`reg_w] = 1'b0;
             // load now
-            // TODO: ir_load should not be 1 here
-            C[`ir_load] = 1'b1;
             read = 1'b1;
             write = 1'b0;
             // selections

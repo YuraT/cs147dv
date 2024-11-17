@@ -113,7 +113,7 @@ buf addr_buf [25:0] (addr, ir[25:0]);
 
 // Instruction Register input
 // Instruction Register
-REG32 ir_inst(.Q(ir), .D(DATA_IN), .LOAD(ir_load), .CLK(CLK), .RESET(RST));
+D_LATCH32 ir_inst(.Q(ir), .D(DATA_IN), .LOAD(ir_load), .RESET(RST));
 
 // Register File Input
 wire [31:0] r1_sel, wa_sel, wd_sel;
