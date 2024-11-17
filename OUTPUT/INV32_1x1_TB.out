@@ -1,0 +1,8 @@
+// memory data file (do not edit the following line - required for mem load use)
+// instance=/INV32_1x1_TB/result
+// format=hex addressradix=h dataradix=h version=1.0 wordsperline=1 noaddress
+0000ffff
+ffffffff
+5a5a5a5a
+0000ffff
+ffff0000
