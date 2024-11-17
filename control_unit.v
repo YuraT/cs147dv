@@ -18,6 +18,40 @@
 //  1.0     Sep 10, 2014	Kaushik Patra	kpatra@sjsu.edu		Initial creation
 //------------------------------------------------------------------------------------------
 `include "prj_definition.v"
+
+`define ALU_ADD 6'h01
+`define ALU_SUB 6'h02
+`define ALU_MUL 6'h03
+`define ALU_SRL 6'h04
+`define ALU_SLL 6'h05
+`define ALU_AND 6'h06
+`define ALU_OR  6'h07
+`define ALU_NOR 6'h08
+`define ALU_SLT 6'h09
+
+`define OP_RTYPE 6'h00
+`define FN_ADD 6'h20
+`define FN_SUB 6'h22
+`define FN_MUL 6'h2c
+`define FN_AND 6'h24
+`define FN_OR 6'h25
+`define FN_NOR 6'h27
+`define FN_SLT 6'h2a
+`define FN_SLL 6'h01
+`define FN_SRL 6'h02
+`define FN_JR 6'h08
+
+`define OP_ADDI 6'h08
+`define OP_MULI 6'h1d
+`define OP_ANDI 6'h0c
+`define OP_ORI 6'h0d
+`define OP_LUI 6'h0f
+`define OP_SLTI 6'h0a
+`define OP_BEQ 6'h04
+`define OP_BNE 6'h05
+`define OP_LW 6'h23
+`define OP_SW 6'h2b
+
 module CONTROL_UNIT(CTRL, READ, WRITE, ZERO, INSTRUCTION, CLK, RST);
 // Output signals
 output [`CTRL_WIDTH_INDEX_LIMIT:0]  CTRL;
@@ -143,29 +177,15 @@ buf (CTRL[26], wa_sel_1);
 buf (CTRL[27], wa_sel_2);
 buf (CTRL[28], wa_sel_3);
 
-// Parse the instruction data, same as in data_path.v
-wire [5:0]   opcode;
-wire [4:0]   rs;
-wire [4:0]   rt;
-wire [4:0]   rd;
-wire [4:0]   shamt;
-wire [5:0]   funct;
-wire [15:0]  imm;
-wire [25:0]  addr;
-
-// common for all
-buf opcode_buf [5:0] (opcode, INSTRUCTION[31:26]);
-// common for R-type, I-type
-buf rs_buf [4:0] (rs, INSTRUCTION[25:21]);
-buf rt_buf [4:0] (rt, INSTRUCTION[20:16]);
-// for R-type
-buf rd_buf [4:0] (rd, INSTRUCTION[15:11]);
-buf shamt_buf [4:0] (shamt, INSTRUCTION[10:6]);
-buf funct_buf [5:0] (funct, INSTRUCTION[5:0]);
-// for I-type
-buf imm_buf [15:0] (imm, INSTRUCTION[15:0]);
-// for J-type
-buf addr_buf [25:0] (addr, INSTRUCTION[25:0]);
+// Parse the instruction data
+reg [5:0]   opcode;
+reg [4:0]   rs;
+reg [4:0]   rt;
+reg [4:0]   rd;
+reg [4:0]   shamt;
+reg [5:0]   funct;
+reg [15:0]  imm;
+reg [25:0]  addr;
 
 // State machine
 wire [2:0] state;
@@ -173,6 +193,13 @@ PROC_SM proc_sm(state, CLK, RST);
 
 // TBD - take action on each +ve edge of clock
 always @ (state) begin
+    // R-type
+    {opcode, rs, rt, rd, shamt, funct} = INSTRUCTION;
+    // I-type
+    {opcode, rs, rt, imm} = INSTRUCTION;
+    // J-type
+    {opcode, addr} = INSTRUCTION;
+
     // Print current state
     $write("@ %6dns -> ", $time);
     $write("STATE ", state, ": ");
@@ -184,6 +211,7 @@ always @ (state) begin
         `PROC_WB: $write("WRITE BACK");
         default: $write("INVALID");
     endcase
+    $write("\n");
 
     case (state)
         // fetch - next instruction from memory at PC
@@ -230,15 +258,15 @@ always @ (state) begin
             // R-type
             if (opcode == 6'h00) begin
                 case (funct)
-                    6'h20: alu_oprn = 6'h01; // add
-                    6'h22: alu_oprn = 6'h02; // sub
-                    6'h2c: alu_oprn = 6'h03; // mul
-                    6'h02: alu_oprn = 6'h04; // srl
-                    6'h01: alu_oprn = 6'h05; // sll
-                    6'h24: alu_oprn = 6'h06; // and
-                    6'h25: alu_oprn = 6'h07; // or
-                    6'h27: alu_oprn = 6'h08; // nor
-                    6'h2a: alu_oprn = 6'h09; // slt
+                    6'h20: alu_oprn = `ALU_ADD;
+                    6'h22: alu_oprn = `ALU_SUB;
+                    6'h2c: alu_oprn = `ALU_MUL;
+                    6'h02: alu_oprn = `ALU_SRL;
+                    6'h01: alu_oprn = `ALU_SLL;
+                    6'h24: alu_oprn = `ALU_AND;
+                    6'h25: alu_oprn = `ALU_OR;
+                    6'h27: alu_oprn = `ALU_NOR;
+                    6'h2a: alu_oprn = `ALU_SLT;
                     default: alu_oprn = 6'hxx;
                 endcase
             end
@@ -246,18 +274,18 @@ always @ (state) begin
             else begin
                 case (opcode)
                     // I-type
-                    6'h08: alu_oprn = 6'h01; // addi
-                    6'h1d: alu_oprn = 6'h03; // muli
-                    6'h0c: alu_oprn = 6'h06; // andi
-                    6'h0d: alu_oprn = 6'h07; // ori
-                    6'h0a: alu_oprn = 6'h09; // slti
-                    6'h04: alu_oprn = 6'h02; // beq - sub
-                    6'h05: alu_oprn = 6'h02; // bne - sub
-                    6'h23: alu_oprn = 6'h01; // lw - add
-                    6'h2b: alu_oprn = 6'h01; // sw - add
+                    6'h08: alu_oprn = `ALU_ADD;  // addi
+                    6'h1d: alu_oprn = `ALU_MUL;  // muli
+                    6'h0c: alu_oprn = `ALU_AND;  // andi
+                    6'h0d: alu_oprn = `ALU_OR;   // ori
+                    6'h0a: alu_oprn = `ALU_SLT;  // slti
+                    6'h04: alu_oprn = `ALU_SUB;  // beq - sub
+                    6'h05: alu_oprn = `ALU_SUB;  // bne - sub
+                    6'h23: alu_oprn = `ALU_ADD;  // lw - add
+                    6'h2b: alu_oprn = `ALU_ADD;  // sw - add
                     // J-type
-                    6'h1b: alu_oprn = 6'h02; // push - sub
-                    6'h1c: alu_oprn = 6'h01; // pop - add
+                    6'h1b: alu_oprn = `ALU_SUB;  // push - sub
+                    6'h1c: alu_oprn = `ALU_ADD;  // pop - add
                     default: alu_oprn = 6'hxx;
                 endcase
             end
