@@ -55,6 +55,7 @@
 `define wa_sel_3  28
 
 // ALU operation codes
+`define ALU_NOP 6'h00
 `define ALU_ADD 6'h01
 `define ALU_SUB 6'h02
 `define ALU_MUL 6'h03
@@ -66,6 +67,7 @@
 `define ALU_SLT 6'h09
 
 // Instruction opcodes
+// R-type
 `define OP_RTYPE 6'h00
 `define FN_ADD   6'h20
 `define FN_SUB   6'h22
@@ -77,7 +79,7 @@
 `define FN_SLL   6'h01
 `define FN_SRL   6'h02
 `define FN_JR    6'h08
-
+// I-type
 `define OP_ADDI 6'h08
 `define OP_MULI 6'h1d
 `define OP_ANDI 6'h0c
@@ -88,6 +90,11 @@
 `define OP_BNE  6'h05
 `define OP_LW   6'h23
 `define OP_SW   6'h2b
+// J-type
+`define OP_JMP  6'h02
+`define OP_JAL  6'h03
+`define OP_PUSH 6'h1b
+`define OP_POP  6'h1c
 
 module CONTROL_UNIT(CTRL, READ, WRITE, ZERO, INSTRUCTION, CLK, RST);
 // Output signals
@@ -121,39 +128,38 @@ $write("@ %6dns -> [0X%08h] ", $time, inst);
 
 case(opcode2)
 // R-Type
-6'h00 : begin
-            case(funct2)
-                6'h20: $write("add  r[%02d], r[%02d], r[%02d];", rd2, rs2, rt2);
-                6'h22: $write("sub  r[%02d], r[%02d], r[%02d];", rd2, rs2, rt2);
-                6'h2c: $write("mul  r[%02d], r[%02d], r[%02d];", rd2, rs2, rt2);
-                6'h24: $write("and  r[%02d], r[%02d], r[%02d];", rd2, rs2, rt2);
- 		        6'h25: $write("or   r[%02d], r[%02d], r[%02d];", rd2, rs2, rt2);
-                6'h27: $write("nor  r[%02d], r[%02d], r[%02d];", rd2, rs2, rt2);
-                6'h2a: $write("slt  r[%02d], r[%02d], r[%02d];", rd2, rs2, rt2);
-                6'h01: $write("sll  r[%02d], r[%02d], %2d;", rd2, rs2, shamt2);
-                6'h02: $write("srl  r[%02d], 0X%02h, r[%02d];", rd2, rs2, shamt2);
-                6'h08: $write("jr   r[%02d];", rs2);
-                default: begin $write("");
-		end
-            endcase
-        end
-// I-type
-6'h08 : $write("addi  r[%02d], r[%02d], 0X%04h;", rt2, rs2, immediate2);
-6'h1d : $write("muli  r[%02d], r[%02d], 0X%04h;", rt2, rs2, immediate2);
-6'h0c : $write("andi  r[%02d], r[%02d], 0X%04h;", rt2, rs2, immediate2);
-6'h0d : $write("ori   r[%02d], r[%02d], 0X%04h;", rt2, rs2, immediate2);
-6'h0f : $write("lui   r[%02d], 0X%04h;", rt2, immediate2);
-6'h0a : $write("slti  r[%02d], r[%02d], 0X%04h;", rt2, rs2, immediate2);
-6'h04 : $write("beq   r[%02d], r[%02d], 0X%04h;", rt2, rs2, immediate2);
-6'h05 : $write("bne   r[%02d], r[%02d], 0X%04h;", rt2, rs2, immediate2);
-6'h23 : $write("lw    r[%02d], r[%02d], 0X%04h;", rt2, rs2, immediate2);
-6'h2b : $write("sw    r[%02d], r[%02d], 0X%04h;", rt2, rs2, immediate2);
-// J-Type
-6'h02 : $write("jmp   0X%07h;", address2);
-6'h03 : $write("jal   0X%07h;", address2);
-6'h1b : $write("push;");
-6'h1c : $write("pop;");
-default: $write("");
+    6'h00 : begin
+        case(funct2)
+            6'h20: $write("add  r[%02d], r[%02d], r[%02d];", rd2, rs2, rt2);
+            6'h22: $write("sub  r[%02d], r[%02d], r[%02d];", rd2, rs2, rt2);
+            6'h2c: $write("mul  r[%02d], r[%02d], r[%02d];", rd2, rs2, rt2);
+            6'h24: $write("and  r[%02d], r[%02d], r[%02d];", rd2, rs2, rt2);
+            6'h25: $write("or   r[%02d], r[%02d], r[%02d];", rd2, rs2, rt2);
+            6'h27: $write("nor  r[%02d], r[%02d], r[%02d];", rd2, rs2, rt2);
+            6'h2a: $write("slt  r[%02d], r[%02d], r[%02d];", rd2, rs2, rt2);
+            6'h01: $write("sll  r[%02d], r[%02d], %2d;", rd2, rs2, shamt2);
+            6'h02: $write("srl  r[%02d], 0X%02h, r[%02d];", rd2, rs2, shamt2);
+            6'h08: $write("jr   r[%02d];", rs2);
+            default: $write("");
+        endcase
+    end
+    // I-type
+    6'h08 : $write("addi  r[%02d], r[%02d], 0X%04h;", rt2, rs2, immediate2);
+    6'h1d : $write("muli  r[%02d], r[%02d], 0X%04h;", rt2, rs2, immediate2);
+    6'h0c : $write("andi  r[%02d], r[%02d], 0X%04h;", rt2, rs2, immediate2);
+    6'h0d : $write("ori   r[%02d], r[%02d], 0X%04h;", rt2, rs2, immediate2);
+    6'h0f : $write("lui   r[%02d], 0X%04h;", rt2, immediate2);
+    6'h0a : $write("slti  r[%02d], r[%02d], 0X%04h;", rt2, rs2, immediate2);
+    6'h04 : $write("beq   r[%02d], r[%02d], 0X%04h;", rt2, rs2, immediate2);
+    6'h05 : $write("bne   r[%02d], r[%02d], 0X%04h;", rt2, rs2, immediate2);
+    6'h23 : $write("lw    r[%02d], r[%02d], 0X%04h;", rt2, rs2, immediate2);
+    6'h2b : $write("sw    r[%02d], r[%02d], 0X%04h;", rt2, rs2, immediate2);
+    // J-Type
+    6'h02 : $write("jmp   0X%07h;", address2);
+    6'h03 : $write("jal   0X%07h;", address2);
+    6'h1b : $write("push;");
+    6'h1c : $write("pop;");
+    default: $write("");
 endcase
 
 $write("\n");
@@ -209,33 +215,27 @@ always @ (state) begin
     case (state)
         // fetch - next instruction from memory at PC
         `PROC_FETCH: begin
-            print_instruction(INSTRUCTION);
             // set everything in ctrl to 0
             C = 32'b0;
-
-            // loaded in previous state, set to 0
-            C[`pc_load] = 1'b0;
-            C[`ir_load] = 1'b0;
-            C[`sp_load] = 1'b0;
-            C[`reg_r] = 1'b0;
-            C[`reg_w] = 1'b0;
-            // load now
+            // memory
             read = 1'b1;
             write = 1'b0;
             // selections
-            // ma_sel_2 - load data from mem[PC]
-            C[`ma_sel_1] = 1'b0;
-            C[`ma_sel_2] = 1'b1;
+            C[`ma_sel_2] = 1'b1; // load data from mem[PC]
         end
         // decode - parse instruction and read values from register file
         `PROC_DECODE: begin
             // loaded in previous state, set to 0
-            C[`sp_load] = 1'b0;
             read = 1'b0;
             // load now
             C[`ir_load] = 1'b1;
             C[`reg_r] = 1'b1;
-            C[`reg_w] = 1'b0;
+        end
+        // execute - perform operation based on instruction
+        `PROC_EXE: begin
+            print_instruction(INSTRUCTION);
+            // loaded in previous state, set to 0
+            C[`ir_load] = 1'b0;
             // selections
             // r1_sel_1: push - store value of r0 at stack pointer
             C[`r1_sel_1] = opcode != 6'h1b ? 1'b0 : 1'b1;
@@ -251,41 +251,41 @@ always @ (state) begin
             // TODO: this should only be selected if the condition is met
             // pc_sel_2 = opcode == 6'h04 || opcode == 6'h05 ? 1'b1 : 1'b0;
             // jmp, jal - jump to address
-            C[`pc_sel_3] = opcode == 6'h02 || opcode == 6'h03 ? 1'b0 : 1'b1;
+            C[`pc_sel_3] = opcode == `OP_JMP || opcode == `OP_JAL ? 1'b0 : 1'b1;
 
             // alu_oprn - operation to be performed by ALU
             // R-type
-            if (opcode == 6'h00) begin
+            if (opcode == `OP_RTYPE) begin
                 case (funct)
-                    6'h20: C[`alu_oprn] = `ALU_ADD;
-                    6'h22: C[`alu_oprn] = `ALU_SUB;
-                    6'h2c: C[`alu_oprn] = `ALU_MUL;
-                    6'h02: C[`alu_oprn] = `ALU_SRL;
-                    6'h01: C[`alu_oprn] = `ALU_SLL;
-                    6'h24: C[`alu_oprn] = `ALU_AND;
-                    6'h25: C[`alu_oprn] = `ALU_OR;
-                    6'h27: C[`alu_oprn] = `ALU_NOR;
-                    6'h2a: C[`alu_oprn] = `ALU_SLT;
-                    default: C[`alu_oprn] = 6'h00;
+                    `FN_ADD: C[`alu_oprn] = `ALU_ADD;
+                    `FN_SUB: C[`alu_oprn] = `ALU_SUB;
+                    `FN_MUL: C[`alu_oprn] = `ALU_MUL;
+                    `FN_SRL: C[`alu_oprn] = `ALU_SRL;
+                    `FN_SLL: C[`alu_oprn] = `ALU_SLL;
+                    `FN_AND: C[`alu_oprn] = `ALU_AND;
+                    `FN_OR: C[`alu_oprn] = `ALU_OR;
+                    `FN_NOR: C[`alu_oprn] = `ALU_NOR;
+                    `FN_SLT: C[`alu_oprn] = `ALU_SLT;
+                    default: C[`alu_oprn] = `ALU_NOP;
                 endcase
             end
             // I-type and J-type
             else begin
                 case (opcode)
                     // I-type
-                    6'h08: C[`alu_oprn] = `ALU_ADD;  // addi
-                    6'h1d: C[`alu_oprn] = `ALU_MUL;  // muli
-                    6'h0c: C[`alu_oprn] = `ALU_AND;  // andi
-                    6'h0d: C[`alu_oprn] = `ALU_OR;   // ori
-                    6'h0a: C[`alu_oprn] = `ALU_SLT;  // slti
-                    6'h04: C[`alu_oprn] = `ALU_SUB;  // beq - sub
-                    6'h05: C[`alu_oprn] = `ALU_SUB;  // bne - sub
-                    6'h23: C[`alu_oprn] = `ALU_ADD;  // lw - add
-                    6'h2b: C[`alu_oprn] = `ALU_ADD;  // sw - add
+                    `OP_ADDI: C[`alu_oprn] = `ALU_ADD;  // addi
+                    `OP_MULI: C[`alu_oprn] = `ALU_MUL;  // muli
+                    `OP_ANDI: C[`alu_oprn] = `ALU_AND;  // andi
+                    `OP_ORI: C[`alu_oprn] = `ALU_OR;   // ori
+                    `OP_SLTI: C[`alu_oprn] = `ALU_SLT;  // slti
+                    `OP_BEQ: C[`alu_oprn] = `ALU_SUB;  // beq - sub
+                    `OP_BNE: C[`alu_oprn] = `ALU_SUB;  // bne - sub
+                    `OP_LW: C[`alu_oprn] = `ALU_ADD;  // lw - add
+                    `OP_SW: C[`alu_oprn] = `ALU_ADD;  // sw - add
                     // J-type
-                    6'h1b: C[`alu_oprn] = `ALU_SUB;  // push - sub
-                    6'h1c: C[`alu_oprn] = `ALU_ADD;  // pop - add
-                    default: C[`alu_oprn] = 6'h00;
+                    `OP_PUSH: C[`alu_oprn] = `ALU_SUB;  // push - sub
+                    `OP_POP: C[`alu_oprn] = `ALU_ADD;  // pop - add
+                    default: C[`alu_oprn] = `ALU_NOP;
                 endcase
             end
             // op1_sel_1 - select r1 or sp based on opcode
@@ -304,12 +304,7 @@ always @ (state) begin
             // I-type or shift or inc/dec - op2_sel_3, else r2
             // i.e. r2 only if R-type and not shift
             C[`op2_sel_4] = opcode != 6'h00 || C[`alu_oprn] == 6'h04 || C[`alu_oprn] == 6'h05 ? 1'b0 : 1'b1;
-        end
-        // execute - perform operation based on instruction
-        `PROC_EXE: begin
-            // loaded in previous state, set to 0
-            C[`ir_load] = 1'b0;
-            // selections
+
             // wd_sel_1 - alu_out or DATA_IN
             C[`wd_sel_1] = 1'b0;
             // wd_sel_2 - wd_sel_1 or imm_zx_lsb
@@ -329,8 +324,8 @@ always @ (state) begin
                 write = 1'b1;
             end
             else begin
-                read = 1'b1;
-                write = 1'b0;
+//                read = 1'b1;
+//                write = 1'b0;
             end
         end
         `PROC_WB: begin
@@ -347,16 +342,12 @@ always @ (state) begin
                     || (opcode == 6'h1c || opcode == 6'h03) // pop or jal
                     ? 1'b1 : 1'b0;
             // selections
-            // ma_sel_2 - load data from mem[PC]
-            C[`ma_sel_2] = 1'b1;
             // pc_sel_2 - branch if equal or not equal
             C[`pc_sel_2] = (opcode == 6'h04 && ZERO) || (opcode == 6'h05 && ~ZERO) ? 1'b1 : 1'b0;
 
         end
     endcase
-
 end
-
 endmodule
 
 
@@ -404,5 +395,4 @@ always @ (posedge CLK) begin
 end
 
 assign STATE = state_sel;
-
 endmodule
