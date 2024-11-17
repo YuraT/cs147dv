@@ -19,6 +19,42 @@
 //------------------------------------------------------------------------------------------
 `include "prj_definition.v"
 
+// Control signals, same as in data_path.v
+`define pc_load   0
+`define pc_sel_1  1
+`define pc_sel_2  2
+`define pc_sel_3  3
+
+`define ir_load   4
+
+`define r1_sel_1  5
+`define reg_r     6
+`define reg_w     7
+
+`define sp_load   8
+
+`define op1_sel_1 9
+`define op2_sel_1 10
+`define op2_sel_2 11
+`define op2_sel_3 12
+`define op2_sel_4 13
+
+`define alu_oprn  19:14
+
+`define ma_sel_1  20
+`define ma_sel_2  21
+
+`define md_sel_1  22
+
+`define wd_sel_1  23
+`define wd_sel_2  24
+`define wd_sel_3  25
+
+`define wa_sel_1  26
+`define wa_sel_2  27
+`define wa_sel_3  28
+
+// ALU operation codes
 `define ALU_ADD 6'h01
 `define ALU_SUB 6'h02
 `define ALU_MUL 6'h03
@@ -29,28 +65,29 @@
 `define ALU_NOR 6'h08
 `define ALU_SLT 6'h09
 
+// Instruction opcodes
 `define OP_RTYPE 6'h00
-`define FN_ADD 6'h20
-`define FN_SUB 6'h22
-`define FN_MUL 6'h2c
-`define FN_AND 6'h24
-`define FN_OR 6'h25
-`define FN_NOR 6'h27
-`define FN_SLT 6'h2a
-`define FN_SLL 6'h01
-`define FN_SRL 6'h02
-`define FN_JR 6'h08
+`define FN_ADD   6'h20
+`define FN_SUB   6'h22
+`define FN_MUL   6'h2c
+`define FN_AND   6'h24
+`define FN_OR    6'h25
+`define FN_NOR   6'h27
+`define FN_SLT   6'h2a
+`define FN_SLL   6'h01
+`define FN_SRL   6'h02
+`define FN_JR    6'h08
 
 `define OP_ADDI 6'h08
 `define OP_MULI 6'h1d
 `define OP_ANDI 6'h0c
-`define OP_ORI 6'h0d
-`define OP_LUI 6'h0f
+`define OP_ORI  6'h0d
+`define OP_LUI  6'h0f
 `define OP_SLTI 6'h0a
-`define OP_BEQ 6'h04
-`define OP_BNE 6'h05
-`define OP_LW 6'h23
-`define OP_SW 6'h2b
+`define OP_BEQ  6'h04
+`define OP_BNE  6'h05
+`define OP_LW   6'h23
+`define OP_SW   6'h2b
 
 module CONTROL_UNIT(CTRL, READ, WRITE, ZERO, INSTRUCTION, CLK, RST);
 // Output signals
@@ -90,7 +127,7 @@ case(opcode2)
                 6'h22: $write("sub  r[%02d], r[%02d], r[%02d];", rd2, rs2, rt2);
                 6'h2c: $write("mul  r[%02d], r[%02d], r[%02d];", rd2, rs2, rt2);
                 6'h24: $write("and  r[%02d], r[%02d], r[%02d];", rd2, rs2, rt2);
- 		6'h25: $write("or   r[%02d], r[%02d], r[%02d];", rd2, rs2, rt2);
+ 		        6'h25: $write("or   r[%02d], r[%02d], r[%02d];", rd2, rs2, rt2);
                 6'h27: $write("nor  r[%02d], r[%02d], r[%02d];", rd2, rs2, rt2);
                 6'h2a: $write("slt  r[%02d], r[%02d], r[%02d];", rd2, rs2, rt2);
                 6'h01: $write("sll  r[%02d], r[%02d], %2d;", rd2, rs2, shamt2);
@@ -126,56 +163,12 @@ endtask
 
 
 reg read, write;
-assign READ = read;
-assign WRITE = write;
+buf (READ, read);
+buf (WRITE, write);
 
-// Control signals, same as in data_path.v
-reg pc_load, pc_sel_1, pc_sel_2, pc_sel_3,
-    ir_load, reg_r, reg_w,
-    r1_sel_1, wa_sel_1, wa_sel_2, wa_sel_3,
+reg [31:0] C;
 
-    sp_load, op1_sel_1,
-    op2_sel_1, op2_sel_2, op2_sel_3, op2_sel_4,
-
-    wd_sel_1, wd_sel_2, wd_sel_3,
-    ma_sel_1, ma_sel_2,
-    md_sel_1;
-
-reg [5:0] alu_oprn;
-
-buf (CTRL[0], pc_load);
-buf (CTRL[1], pc_sel_1);
-buf (CTRL[2], pc_sel_2);
-buf (CTRL[3], pc_sel_3);
-
-buf (CTRL[4], ir_load);
-
-buf (CTRL[5], r1_sel_1);
-buf (CTRL[6], reg_r);
-buf (CTRL[7], reg_w);
-
-buf (CTRL[8], sp_load);
-
-buf (CTRL[9], op1_sel_1);
-buf (CTRL[10], op2_sel_1);
-buf (CTRL[11], op2_sel_2);
-buf (CTRL[12], op2_sel_3);
-buf (CTRL[13], op2_sel_4);
-
-buf alu_oprn_buf [5:0] (CTRL[19:14], alu_oprn);
-
-buf (CTRL[20], ma_sel_1);
-buf (CTRL[21], ma_sel_2);
-
-buf (CTRL[22], md_sel_1);
-
-buf (CTRL[23], wd_sel_1);
-buf (CTRL[24], wd_sel_2);
-buf (CTRL[25], wd_sel_3);
-
-buf (CTRL[26], wa_sel_1);
-buf (CTRL[27], wa_sel_2);
-buf (CTRL[28], wa_sel_3);
+buf ctrl_buf [31:0] (CTRL, C);
 
 // Parse the instruction data
 reg [5:0]   opcode;
@@ -201,124 +194,133 @@ always @ (state) begin
     {opcode, addr} = INSTRUCTION;
 
     // Print current state
-    $write("@ %6dns -> ", $time);
-    $write("STATE ", state, ": ");
-    case (state)
-        `PROC_FETCH: $write("FETCH");
-        `PROC_DECODE: $write("DECODE");
-        `PROC_EXE: $write("EXECUTE");
-        `PROC_MEM: $write("MEMORY");
-        `PROC_WB: $write("WRITE BACK");
-        default: $write("INVALID");
-    endcase
-    $write("\n");
+//    $write("@ %6dns -> ", $time);
+//    $write("STATE ", state, ": ");
+//    case (state)
+//        `PROC_FETCH: $write("FETCH");
+//        `PROC_DECODE: $write("DECODE");
+//        `PROC_EXE: $write("EXECUTE");
+//        `PROC_MEM: $write("MEMORY");
+//        `PROC_WB: $write("WRITE BACK");
+//        default: $write("INVALID");
+//    endcase
+//    $write("\n");
 
     case (state)
         // fetch - next instruction from memory at PC
         `PROC_FETCH: begin
+            print_instruction(INSTRUCTION);
+            // set everything in ctrl to 0
+            C = 32'b0;
+
             // loaded in previous state, set to 0
-            pc_load = 1'b0;
-            reg_r = 1'b0;
-            reg_w = 1'b0;
+            C[`pc_load] = 1'b0;
+            C[`sp_load] = 1'b0;
+            C[`reg_r] = 1'b0;
+            C[`reg_w] = 1'b0;
             // load now
-            ir_load = 1'b1;
+            // TODO: ir_load should not be 1 here
+            C[`ir_load] = 1'b1;
             read = 1'b1;
             write = 1'b0;
             // selections
             // ma_sel_2 - load data from mem[PC]
-            ma_sel_2 = 1'b1;
+            C[`ma_sel_1] = 1'b0;
+            C[`ma_sel_2] = 1'b1;
         end
         // decode - parse instruction and read values from register file
         `PROC_DECODE: begin
             // loaded in previous state, set to 0
-            ir_load = 1'b0;
-            sp_load = 1'b0;
+            C[`sp_load] = 1'b0;
             read = 1'b0;
             // load now
-            reg_r = 1'b1;
-            reg_w = 1'b0;
+            C[`ir_load] = 1'b1;
+            C[`reg_r] = 1'b1;
+            C[`reg_w] = 1'b0;
             // selections
             // r1_sel_1: push - store value of r0 at stack pointer
-            r1_sel_1 = opcode != 6'h1b ? 1'b0 : 1'b1;
+            C[`r1_sel_1] = opcode != 6'h1b ? 1'b0 : 1'b1;
             // wa_sel_1: R-type - write to rd, I-type - write to rt
-            wa_sel_1 = opcode == 6'h00 ? 1'b0 : 1'b1;
+            C[`wa_sel_1] = opcode == 6'h00 ? 1'b0 : 1'b1;
             // wa_sel_2: jal - write to r31, pop - write to r0
-            wa_sel_2 = opcode == 6'h03 ? 1'b1 : 1'b0;
+            C[`wa_sel_2] = opcode == 6'h03 ? 1'b1 : 1'b0;
             // wa_sel_3: push or pop - wa_sel_2, else wa_sel_1
-            wa_sel_3 = opcode == 6'h03 || opcode == 6'h1c ? 1'b0 : 1'b1;
+            C[`wa_sel_3] = opcode == 6'h03 || opcode == 6'h1c ? 1'b0 : 1'b1;
             // jr - jump to address in register
-            pc_sel_1 = opcode == 6'h00 && funct == 6'h08 ? 1'b0 : 1'b1;
+            C[`pc_sel_1] = opcode == 6'h00 && funct == 6'h08 ? 1'b0 : 1'b1;
             // beq, bne - branch if equal or not equal
             // TODO: this should only be selected if the condition is met
             // pc_sel_2 = opcode == 6'h04 || opcode == 6'h05 ? 1'b1 : 1'b0;
             // jmp, jal - jump to address
-            pc_sel_3 = opcode == 6'h02 || opcode == 6'h03 ? 1'b0 : 1'b1;
+            C[`pc_sel_3] = opcode == 6'h02 || opcode == 6'h03 ? 1'b0 : 1'b1;
 
             // alu_oprn - operation to be performed by ALU
             // R-type
             if (opcode == 6'h00) begin
                 case (funct)
-                    6'h20: alu_oprn = `ALU_ADD;
-                    6'h22: alu_oprn = `ALU_SUB;
-                    6'h2c: alu_oprn = `ALU_MUL;
-                    6'h02: alu_oprn = `ALU_SRL;
-                    6'h01: alu_oprn = `ALU_SLL;
-                    6'h24: alu_oprn = `ALU_AND;
-                    6'h25: alu_oprn = `ALU_OR;
-                    6'h27: alu_oprn = `ALU_NOR;
-                    6'h2a: alu_oprn = `ALU_SLT;
-                    default: alu_oprn = 6'hxx;
+                    6'h20: C[`alu_oprn] = `ALU_ADD;
+                    6'h22: C[`alu_oprn] = `ALU_SUB;
+                    6'h2c: C[`alu_oprn] = `ALU_MUL;
+                    6'h02: C[`alu_oprn] = `ALU_SRL;
+                    6'h01: C[`alu_oprn] = `ALU_SLL;
+                    6'h24: C[`alu_oprn] = `ALU_AND;
+                    6'h25: C[`alu_oprn] = `ALU_OR;
+                    6'h27: C[`alu_oprn] = `ALU_NOR;
+                    6'h2a: C[`alu_oprn] = `ALU_SLT;
+                    default: C[`alu_oprn] = 6'h00;
                 endcase
             end
             // I-type and J-type
             else begin
                 case (opcode)
                     // I-type
-                    6'h08: alu_oprn = `ALU_ADD;  // addi
-                    6'h1d: alu_oprn = `ALU_MUL;  // muli
-                    6'h0c: alu_oprn = `ALU_AND;  // andi
-                    6'h0d: alu_oprn = `ALU_OR;   // ori
-                    6'h0a: alu_oprn = `ALU_SLT;  // slti
-                    6'h04: alu_oprn = `ALU_SUB;  // beq - sub
-                    6'h05: alu_oprn = `ALU_SUB;  // bne - sub
-                    6'h23: alu_oprn = `ALU_ADD;  // lw - add
-                    6'h2b: alu_oprn = `ALU_ADD;  // sw - add
+                    6'h08: C[`alu_oprn] = `ALU_ADD;  // addi
+                    6'h1d: C[`alu_oprn] = `ALU_MUL;  // muli
+                    6'h0c: C[`alu_oprn] = `ALU_AND;  // andi
+                    6'h0d: C[`alu_oprn] = `ALU_OR;   // ori
+                    6'h0a: C[`alu_oprn] = `ALU_SLT;  // slti
+                    6'h04: C[`alu_oprn] = `ALU_SUB;  // beq - sub
+                    6'h05: C[`alu_oprn] = `ALU_SUB;  // bne - sub
+                    6'h23: C[`alu_oprn] = `ALU_ADD;  // lw - add
+                    6'h2b: C[`alu_oprn] = `ALU_ADD;  // sw - add
                     // J-type
-                    6'h1b: alu_oprn = `ALU_SUB;  // push - sub
-                    6'h1c: alu_oprn = `ALU_ADD;  // pop - add
-                    default: alu_oprn = 6'hxx;
+                    6'h1b: C[`alu_oprn] = `ALU_SUB;  // push - sub
+                    6'h1c: C[`alu_oprn] = `ALU_ADD;  // pop - add
+                    default: C[`alu_oprn] = 6'h00;
                 endcase
             end
             // op1_sel_1 - select r1 or sp based on opcode
             // push or pop - sp, else r1
-            op1_sel_1 = opcode == 6'h1b || opcode == 6'h1c ? 1'b1 : 1'b0;
+            C[`op1_sel_1] = opcode == 6'h1b || opcode == 6'h1c ? 1'b1 : 1'b0;
             // op2_sel_1 - select 1 or shamt based on alu_oprn
             // sll or srl - shamt, else 1 (for increments/decrements)
-            op2_sel_1 = alu_oprn == 6'h04 || alu_oprn == 6'h05 ? 1'b1 : 1'b0;
+            C[`op2_sel_1] = C[`alu_oprn] == 6'h04 || C[`alu_oprn] == 6'h05 ? 1'b1 : 1'b0;
             // op2_sel_2 - select imm_zx or imm_sx based on alu_oprn
             // logical (and, or) - imm_zx, else imm_sx; ('nor' not availble in I-type)
-            op2_sel_2 = alu_oprn == 6'h06 || alu_oprn == 6'h07 ? 1'b0 : 1'b1;
+            C[`op2_sel_2] = C[`alu_oprn] == 6'h06 || C[`alu_oprn] == 6'h07 ? 1'b0 : 1'b1;
             // op2_sel_3 - select op2_sel_2 or op2_sel_1 based on alu_oprn
             // R-type - op2_sel_1, I-type - op2_sel_2
-            op2_sel_3 = opcode == 6'h00 ? 1'b1 : 1'b0;
+            C[`op2_sel_3] = opcode == 6'h00 ? 1'b1 : 1'b0;
             // op2_sel_4 - select op2_sel_3 or r2
             // I-type or shift or inc/dec - op2_sel_3, else r2
             // i.e. r2 only if R-type and not shift
-            op2_sel_4 = opcode != 6'h00 || alu_oprn == 6'h04 || alu_oprn == 6'h05 ? 1'b0 : 1'b1;
+            C[`op2_sel_4] = opcode != 6'h00 || C[`alu_oprn] == 6'h04 || C[`alu_oprn] == 6'h05 ? 1'b0 : 1'b1;
         end
         // execute - perform operation based on instruction
         `PROC_EXE: begin
+            // loaded in previous state, set to 0
+            C[`ir_load] = 1'b0;
             // selections
             // wd_sel_1 - alu_out or DATA_IN
-            wd_sel_1 = 1'b0;
+            C[`wd_sel_1] = 1'b0;
             // wd_sel_2 - wd_sel_1 or imm_zx_lsb
             // lui - imm_zx_lsb, else wd_sel_1
-            wd_sel_2 = opcode == 6'h0f ? 1'b1 : 1'b0;
+            C[`wd_sel_2] = opcode == 6'h0f ? 1'b1 : 1'b0;
             // wd_sel_3 - pc_inc or wd_sel_2
             // jal - pc_inc, else wd_sel_2
-            wd_sel_3 = opcode == 6'h03 ? 1'b0 : 1'b1;
+            C[`wd_sel_3] = opcode == 6'h03 ? 1'b0 : 1'b1;
             // md_sel_1 - r1 for push, r2 for sw
-            md_sel_1 = opcode == 6'h1b ? 1'b1 : 1'b0;
+            C[`md_sel_1] = opcode == 6'h1b ? 1'b1 : 1'b0;
         end
         `PROC_MEM: begin
             // load now
@@ -337,32 +339,23 @@ always @ (state) begin
             read = 1'b0;
             write = 1'b0;
             // load now
-            pc_load = 1'b1;
+            C[`pc_load] = 1'b1;
             // write to register file if
             // R-type (except jr) or I-type (except beq, bne, sw) or pop or jal
-            reg_w = (opcode == 6'h00 && funct != 6'h08) // R-type (except jr)
+            C[`reg_w] = (opcode == 6'h00 && funct != 6'h08) // R-type (except jr)
                     || (opcode == 6'h08 || opcode == 6'h1d || opcode == 6'h0c || opcode == 6'h0d
                     || opcode == 6'h0f || opcode == 6'h0a || opcode == 6'h23) // I-type (except beq, bne, sw)
                     || (opcode == 6'h1c || opcode == 6'h03) // pop or jal
                     ? 1'b1 : 1'b0;
             // selections
             // ma_sel_2 - load data from mem[PC]
-            ma_sel_2 = 1'b1;
+            C[`ma_sel_2] = 1'b1;
             // pc_sel_2 - branch if equal or not equal
-            pc_sel_2 = (opcode == 6'h04 && ZERO) || (opcode == 6'h05 && ~ZERO) ? 1'b1 : 1'b0;
+            C[`pc_sel_2] = (opcode == 6'h04 && ZERO) || (opcode == 6'h05 && ~ZERO) ? 1'b1 : 1'b0;
 
-        end
-        default: begin
-            $write("@ %6dns -> ", $time);
-            $write("STATE ", state, ": ");
-            $write("INVALID");
-            print_instruction(INSTRUCTION);
         end
     endcase
 
-    // TBD - assign control signals based on instruction
-    print_instruction(INSTRUCTION);
-    // TBD - assign READ and WRITE signals based on instruction
 end
 
 endmodule
