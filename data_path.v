@@ -48,32 +48,33 @@ buf (pc_sel_2, CTRL[2]);
 buf (pc_sel_3, CTRL[3]);
 
 buf (ir_load, CTRL[4]);
-buf (reg_r, CTRL[5]);
-buf (reg_w, CTRL[6]);
 
-buf (r1_sel_1, CTRL[7]);
-buf (wa_sel_1, CTRL[8]);
-buf (wa_sel_2, CTRL[9]);
-buf (wa_sel_3, CTRL[10]);
+buf (r1_sel_1, CTRL[5]);
+buf (reg_r, CTRL[6]);
+buf (reg_w, CTRL[7]);
 
-buf (sp_load, CTRL[11]);
-buf (op1_sel_1, CTRL[12]);
+buf (sp_load, CTRL[8]);
 
-buf (op2_sel_1, CTRL[13]);
-buf (op2_sel_2, CTRL[14]);
-buf (op2_sel_3, CTRL[15]);
-buf (op2_sel_4, CTRL[16]);
+buf (op1_sel_1, CTRL[9]);
+buf (op2_sel_1, CTRL[10]);
+buf (op2_sel_2, CTRL[11]);
+buf (op2_sel_3, CTRL[12]);
+buf (op2_sel_4, CTRL[13]);
 
-buf (wd_sel_1, CTRL[17]);
-buf (wd_sel_2, CTRL[18]);
-buf (wd_sel_3, CTRL[19]);
+buf alu_oprn_buf [5:0] (alu_oprn, CTRL[19:14]);
 
 buf (ma_sel_1, CTRL[20]);
 buf (ma_sel_2, CTRL[21]);
 
 buf (md_sel_1, CTRL[22]);
 
-buf alu_oprn_buf [5:0] (alu_oprn, CTRL[28:23]);
+buf (wd_sel_1, CTRL[23]);
+buf (wd_sel_2, CTRL[24]);
+buf (wd_sel_3, CTRL[25]);
+
+buf (wa_sel_1, CTRL[26]);
+buf (wa_sel_2, CTRL[27]);
+buf (wa_sel_3, CTRL[28]);
 
 // variables
 wire [31:0] ir; // Instruction Register

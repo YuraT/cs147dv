@@ -115,32 +115,33 @@ buf (CTRL[2], pc_sel_2);
 buf (CTRL[3], pc_sel_3);
 
 buf (CTRL[4], ir_load);
-buf (CTRL[5], reg_r);
-buf (CTRL[6], reg_w);
 
-buf (CTRL[7], r1_sel_1);
-buf (CTRL[8], wa_sel_1);
-buf (CTRL[9], wa_sel_2);
-buf (CTRL[10], wa_sel_3);
+buf (CTRL[5], r1_sel_1);
+buf (CTRL[6], reg_r);
+buf (CTRL[7], reg_w);
 
-buf (CTRL[11], sp_load);
-buf (CTRL[12], op1_sel_1);
+buf (CTRL[8], sp_load);
 
-buf (CTRL[13], op2_sel_1);
-buf (CTRL[14], op2_sel_2);
-buf (CTRL[15], op2_sel_3);
-buf (CTRL[16], op2_sel_4);
+buf (CTRL[9], op1_sel_1);
+buf (CTRL[10], op2_sel_1);
+buf (CTRL[11], op2_sel_2);
+buf (CTRL[12], op2_sel_3);
+buf (CTRL[13], op2_sel_4);
 
-buf (CTRL[17], wd_sel_1);
-buf (CTRL[18], wd_sel_2);
-buf (CTRL[19], wd_sel_3);
+buf alu_oprn_buf [5:0] (CTRL[19:14], alu_oprn);
 
 buf (CTRL[20], ma_sel_1);
 buf (CTRL[21], ma_sel_2);
 
 buf (CTRL[22], md_sel_1);
 
-buf alu_oprn_buf [5:0] (CTRL[28:23], alu_oprn);
+buf (CTRL[23], wd_sel_1);
+buf (CTRL[24], wd_sel_2);
+buf (CTRL[25], wd_sel_3);
+
+buf (CTRL[26], wa_sel_1);
+buf (CTRL[27], wa_sel_2);
+buf (CTRL[28], wa_sel_3);
 
 // Parse the instruction data, same as in data_path.v
 wire [5:0]   opcode;
