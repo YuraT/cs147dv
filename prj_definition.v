@@ -23,7 +23,7 @@
 `define ALU_OPRN_INDEX_LIMIT (`ALU_OPRN_WIDTH -1)
 `define ADDRESS_WIDTH 26
 `define ADDRESS_INDEX_LIMIT (`ADDRESS_WIDTH -1)
-`define MEM_SIZE (2 ** `ADDRESS_WIDTH)
+`define MEM_SIZE (2 ** (`ADDRESS_WIDTH - 6))
 `define MEM_INDEX_LIMIT (`MEM_SIZE - 1)
 `define NUM_OF_REG 32
 `define REG_INDEX_LIMIT (`NUM_OF_REG -1)
@@ -41,4 +41,4 @@
 
 // define ISA parameters
 `define INST_START_ADDR 32'h00001000
-`define INIT_STACK_POINTER 32'h03ffffff
+`define INIT_STACK_POINTER 32'h000fffff

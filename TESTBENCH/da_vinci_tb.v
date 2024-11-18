@@ -62,7 +62,7 @@ begin
 #5000   $write("\n");	
 	$write("===> Done simulating fibonacci.dat\n", "");
 	$write("\n");
-	$writememh("./OUTPUT/fibonacci_mem_dump.dat", da_vinci_inst.memory_inst.memory_inst.sram_32x64m, 'h01000000, 'h0100000f);
+	$writememh("./OUTPUT/fibonacci_mem_dump.dat", da_vinci_inst.memory_inst.memory_inst.sram_32x64m, 'h00040000, 'h0004000f);
 /* END : test 1*/
 end
 
@@ -78,7 +78,7 @@ begin
 #5000  	$write("\n");	
 	$write("===> Done simulating RevFib.dat\n", "");
 	$write("\n");
-	$writememh("./OUTPUT/RevFib_mem_dump.dat", da_vinci_inst.memory_inst.memory_inst.sram_32x64m, 'h03fffff0, 'h03ffffff);
+	$writememh("./OUTPUT/RevFib_mem_dump.dat", da_vinci_inst.memory_inst.memory_inst.sram_32x64m, `INIT_STACK_POINTER - 'h0f, `INIT_STACK_POINTER);
 /* END : test 2*/
 end
 
@@ -94,7 +94,7 @@ begin
 #5000  	$write("\n");	
 	$write("===> Done simulating CS147_SP17_HW01_02.dat\n", "");
 	$write("\n");
-	$writememh("./OUTPUT/CS147_SP17_HW01_02_mem_dump.dat", da_vinci_inst.memory_inst.memory_inst.sram_32x64m, 'h01008000, 'h0100800A);
+	$writememh("./OUTPUT/CS147_SP17_HW01_02_mem_dump.dat", da_vinci_inst.memory_inst.memory_inst.sram_32x64m, 'h00048000, 'h0004800A);
 /* END : test 3*/
 end
 
@@ -110,7 +110,7 @@ begin
 #6000  	$write("\n");	
 	$write("===> Done simulating CS147_FL15_HW01_02.dat\n", "");
 	$write("\n");
-	$writememh("./OUTPUT/CS147_FL15_HW01_02_mem_dump.dat", da_vinci_inst.memory_inst.memory_inst.sram_32x64m, 'h03fffff6, 'h03ffffff);
+	$writememh("./OUTPUT/CS147_FL15_HW01_02_mem_dump.dat", da_vinci_inst.memory_inst.memory_inst.sram_32x64m, `INIT_STACK_POINTER - 9, `INIT_STACK_POINTER);
 /* END : test 4*/
 end
 
@@ -126,8 +126,8 @@ begin
 #5000  	$write("\n");	
 	$write("===> Done simulating CS147_SP15_HW01_02.dat\n", "");
 	$write("\n");
-	$writememh("./OUTPUT/CS147_SP15_HW01_02_mem_dump_01.dat", da_vinci_inst.memory_inst.memory_inst.sram_32x64m, 'h01008000, 'h01008005);
-	$writememh("./OUTPUT/CS147_SP15_HW01_02_mem_dump_02.dat", da_vinci_inst.memory_inst.memory_inst.sram_32x64m, 'h03fffffA, 'h03ffffff);
+	$writememh("./OUTPUT/CS147_SP15_HW01_02_mem_dump_01.dat", da_vinci_inst.memory_inst.memory_inst.sram_32x64m, 'h00048000, 'h00048005);
+	$writememh("./OUTPUT/CS147_SP15_HW01_02_mem_dump_02.dat", da_vinci_inst.memory_inst.memory_inst.sram_32x64m, `INIT_STACK_POINTER - 5, `INIT_STACK_POINTER);
 /* END : test 5*/
 end
 	$stop;
