@@ -171,6 +171,8 @@ endtask
 reg read, write;
 buf (READ, read);
 buf (WRITE, write);
+//assign READ = read;
+//assign WRITE = write;
 
 reg [31:0] C;
 
@@ -313,13 +315,18 @@ always @ (state) begin
             // wd_sel_3 - pc_inc or wd_sel_2
             // jal - pc_inc, else wd_sel_2
             C[`wd_sel_3] = opcode == 6'h03 ? 1'b0 : 1'b1;
+            // ma_sel_1 - alu_out for lw or sw, sp for push or pop
+            C[`ma_sel_1] = opcode == `OP_LW || opcode == `OP_SW ? 1'b0 : 1'b1;
+            // ma_sel_2 - 1 for pc, 0 for everything else
+            C[`ma_sel_2] = opcode == `OP_LW || opcode == `OP_SW || opcode == `OP_PUSH || opcode == `OP_POP ? 1'b0 : 1'b1;
             // md_sel_1 - r1 for push, r2 for sw
             C[`md_sel_1] = opcode == 6'h1b ? 1'b1 : 1'b0;
         end
         `PROC_MEM: begin
             // load now
             // push or sw - write to memory
-            if (opcode == 6'h1b || opcode == 6'h2b) begin
+            if (opcode == `OP_PUSH || opcode == `OP_SW) begin
+
                 read = 1'b0;
                 write = 1'b1;
             end
