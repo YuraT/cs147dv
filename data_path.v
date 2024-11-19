@@ -152,7 +152,7 @@ wire [31:0] pc_sel;
 wire [31:0] pc_branch, pc_jump, pc_sel_p1, pc_sel_p2;
 RC_ADD_SUB_32 pc_inc_inst(.Y(pc_inc), .CO(), .A(pc), .B(32'b1), .SnA(1'b0));
 MUX32_2x1 mux_pc_sel_p1(pc_sel_p1, r1, pc_inc, pc_sel_1);
-RC_ADD_SUB_32 pc_sel_2_inst(.Y(pc_branch), .CO(), .A(pc), .B(imm_sx), .SnA(1'b0));
+RC_ADD_SUB_32 pc_sel_2_inst(.Y(pc_branch), .CO(), .A(pc_inc), .B(imm_sx), .SnA(1'b0));
 MUX32_2x1 mux_pc_sel_p2(pc_sel_p2, pc_sel_p1, pc_branch, pc_sel_2);
 buf pc_jump_buf [31:0] (pc_jump, {6'b0, addr});
 MUX32_2x1 mux_pc_sel(pc_sel, pc_jump, pc_sel_p2, pc_sel_3);
