@@ -239,6 +239,8 @@ always @ (state) begin
             print_instruction(INSTRUCTION);
             // loaded in previous state, set to 0
             C[`ir_load] = 1'b0;
+            // load now
+            C[`sp_load] = opcode == `OP_POP; // sp is decremented before pop
             // selections
             // r1_sel_1: rs by default (0), push - r1 (1)
             C[`r1_sel_1] = opcode == `OP_PUSH;
@@ -294,13 +296,14 @@ always @ (state) begin
             end
             // op1_sel_1: r1 by default (0), push or pop - sp (1)
             C[`op1_sel_1] = opcode == `OP_PUSH || opcode == `OP_POP;
-            // op2_sel_1: const 1 (for inc/dec) (0), shamnt for sll/srl (1)
+            // op2_sel_1: const 1 (for inc/dec) (0), shamt for sll/srl (1)
             C[`op2_sel_1] = opcode == `OP_RTYPE && (funct == `FN_SLL || funct == `FN_SRL);
             // op2_sel_2: imm_zx for logical and/or (0), imm_sx otherise (1)
             // ('nor' not availble in I-type)
             C[`op2_sel_2] = ~(opcode == `OP_ANDI || opcode == `OP_ORI);
-            // op2_sel_3: op2_sel_2 for I-type (0), op2_sel_1 for R-type shift (1)
-            C[`op2_sel_3] = opcode == `OP_RTYPE;
+            // op2_sel_3: op2_sel_2 for I-type (0), op2_sel_1 for R-type shift or inc/dec (1)
+            // inc/dec is push or pop
+            C[`op2_sel_3] = opcode == `OP_RTYPE || opcode == `OP_PUSH || opcode == `OP_POP;
             // op2_sel_4: op2_sel_3 for I-type (except beq, bne) or R-type shift or inc/dec (0), else r2 (1)
             // i.e. r2 if R-type (except sll/srl), or bne/beq
             C[`op2_sel_4] = opcode == `OP_RTYPE && ~(funct == `FN_SLL || funct == `FN_SRL)
@@ -322,12 +325,16 @@ always @ (state) begin
             C[`md_sel_1] = opcode == `OP_PUSH;
         end
         `PROC_MEM: begin
+            // loaded in previous state, set to 0
+            C[`sp_load] = 1'b0;
             // push or sw - write to memory
             write = opcode == `OP_PUSH || opcode == `OP_SW;
             // pop or lw - read from memory
             read = opcode == `OP_POP || opcode == `OP_LW;
         end
         `PROC_WB: begin
+            // load now
+            C[`sp_load] = opcode == `OP_PUSH; // sp is incremented after push
             // loaded in previous state, set to 0
             read = 1'b0;
             write = 1'b0;
