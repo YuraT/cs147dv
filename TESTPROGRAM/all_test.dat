@@ -1,0 +1,49 @@
+@0001000
+20001337 // addi r0, r0, 0x1337
+6c000000 // push
+3c1e0004 // lui r30, 0x0004
+37de8000 // ori r30, r30 0x00008000
+afc00000 // sw r0, r30, 0x0
+0c001014 // jal 0x00001014
+70000000 // pop
+20212024 // addi r1, r1, 0x2024
+00011020 // add r2, r0, r1
+00011822 // sub r3, r0, r1
+00202022 // sub r4, r1, r0
+0001282c // mul r5, r0, r1
+00013024 // and r6, r0, r1
+00013825 // or  r7, r0, r1
+00014027 // nor r8, r0, r1
+0001482a // slt r9, r0, r1
+0020502a // slt r10, r1, r0
+00005901 // sll r11, r0, 4
+00006102 // srl r12, r0, 4
+08001017 // jmp 0x00001017
+74000003 // muli r0, r0, 3
+afc00001 // sw r0, r30, 0x1
+03e00008 // jr r31
+8fcd0001 // lw r13, r30, 0x1
+29ae1338 // slti r14, r13, 0x1338
+302f0000 // andi r15, r1, 0x0
+21ef0005 // addi r15, r15, 0x5
+11ee0002 // beq r14, r15, 0x2
+21ce0001 // addi r14, r14, 0x1
+0800101b // jmp 0x0000101b
+afc10002 // sw r1, r30, 0x2
+afc20003 // sw r2, r30, 0x3
+afc30004 // sw r3, r30, 0x4
+afc40005 // sw r4, r30, 0x5
+afc50006 // sw r5, r30, 0x6
+afc60007 // sw r6, r30, 0x7
+afc70008 // sw r7, r30, 0x8
+afc80009 // sw r8, r30, 0x9
+afc9000a // sw r9, r30, 0x0a
+afca000b // sw r10, r30, 0x0b
+afcb000c // sw r11, r30, 0x0c
+afcc000d // sw r12, r30, 0x0d
+afcd000e // sw r13, r30, 0x0e
+afce000f // sw r14, r30, 0x0f
+afcf0010 // sw r15, r30, 0x10
+2210fbb1 // addi r16, r16, 0xfbb1
+1470fffe // bne r16, r3, 0xfffe
+afd00011 // sw r16, r30, 0x11

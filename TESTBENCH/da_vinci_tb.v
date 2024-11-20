@@ -30,7 +30,8 @@ wire [`DATA_INDEX_LIMIT:0] MEM_DATA_OUT, MEM_DATA_IN;
 
 // reset
 reg RST;
-integer t1=1, t2=1, t3=1, t4=1, t5=1;
+//integer t1=1, t2=1, t3=1, t4=1, t5=1, t6=1;
+integer t1=0, t2=0, t3=0, t4=0, t5=0, t6=1;
 
 // Clock generator instance
 CLK_GENERATOR clk_gen_inst(.CLK(CLK));
@@ -129,6 +130,23 @@ begin
 	$writememh("./OUTPUT/CS147_SP15_HW01_02_mem_dump_01.dat", da_vinci_inst.memory_inst.memory_inst.sram_32x64m, 'h00048000, 'h00048005);
 	$writememh("./OUTPUT/CS147_SP15_HW01_02_mem_dump_02.dat", da_vinci_inst.memory_inst.memory_inst.sram_32x64m, `INIT_STACK_POINTER - 5, `INIT_STACK_POINTER);
 /* END : test 5*/
+end
+
+if (t6 === 1)
+begin
+/* START : test 6*/
+#5	RST=1'b0;
+#5 	RST=1'b1;
+        $write("\n");
+	$write("===> Simulating all_test.dat\n", "");
+	$write("\n");
+	$readmemh("./TESTPROGRAM/all_test.dat", da_vinci_inst.memory_inst.memory_inst.sram_32x64m);
+#5000  	$write("\n");
+	$write("===> Done simulating all_test.dat\n", "");
+	$write("\n");
+	$writememh("./OUTPUT/all_test_mem_dump_01.dat", da_vinci_inst.memory_inst.memory_inst.sram_32x64m, 'h00048000, 'h00048011);
+	$writememh("./OUTPUT/all_test_mem_dump_02.dat", da_vinci_inst.memory_inst.memory_inst.sram_32x64m, `INIT_STACK_POINTER - 5, `INIT_STACK_POINTER);
+/* END : test 6*/
 end
 	$stop;
 

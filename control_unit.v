@@ -246,13 +246,13 @@ always @ (state) begin
             C[`r1_sel_1] = opcode == `OP_PUSH;
             // wa_sel_1: R-type - write to rd (0), I-type - write to rt (1)
             C[`wa_sel_1] = opcode != `OP_RTYPE;
-            // wa_sel_2: jal - write to r31 (0), pop - write to r0 (1)
-            C[`wa_sel_2] = opcode == `OP_POP;
+            // wa_sel_2: pop - write to r0 (0), jal - write to r31 (1)
+            C[`wa_sel_2] = opcode == `OP_JAL;
             // wa_sel_3: push or pop - wa_sel_2, else wa_sel_1
-            // wa_sel_3: wa_sel_2 if push or pop (0), else wa_sel_1 (1)
-            C[`wa_sel_3] = ~(opcode == `OP_PUSH || opcode == `OP_POP);
+            // wa_sel_3: wa_sel_2 if push or pop or jal (0), else wa_sel_1 (1)
+            C[`wa_sel_3] = ~(opcode == `OP_PUSH || opcode == `OP_POP || opcode == `OP_JAL);
             // pc_sel_1: jr - jump to address in rs (0), else pc_inc (1)
-            C[`pc_sel_1] = ~(opcode == `OP_JMP && funct == `FN_JR);
+            C[`pc_sel_1] = ~(opcode == `OP_RTYPE && funct == `FN_JR);
             // pc_sel_2: pc_sel_1 by default (0), beq, bne - branch if equal or not equal (1)
             // TODO: this should only be selected if the condition is met
             // pc_sel_2 = opcode == `OP_BEQ || opcode == `OP_BNE;
