@@ -192,7 +192,7 @@ reg [25:0]  addr;
 wire [2:0] state;
 PROC_SM proc_sm(state, CLK, RST);
 
-// TBD - take action on each +ve edge of clock
+// take action on each +ve edge of clock
 always @ (state) begin
     // R-type
     {opcode, rs, rt, rd, shamt, funct} = INSTRUCTION;
@@ -200,19 +200,6 @@ always @ (state) begin
     {opcode, rs, rt, imm} = INSTRUCTION;
     // J-type
     {opcode, addr} = INSTRUCTION;
-
-    // Print current state
-//    $write("@ %6dns -> ", $time);
-//    $write("STATE ", state, ": ");
-//    case (state)
-//        `PROC_FETCH: $write("FETCH");
-//        `PROC_DECODE: $write("DECODE");
-//        `PROC_EXE: $write("EXECUTE");
-//        `PROC_MEM: $write("MEMORY");
-//        `PROC_WB: $write("WRITE BACK");
-//        default: $write("INVALID");
-//    endcase
-//    $write("\n");
 
     case (state)
         // fetch - next instruction from memory at PC
@@ -222,8 +209,8 @@ always @ (state) begin
             // memory
             read = 1'b1;
             write = 1'b0;
-            // selections
-            C[`ma_sel_2] = 1'b1; // load data from mem[PC]
+            // load data from mem[PC]
+            C[`ma_sel_2] = 1'b1;
         end
         // decode - parse instruction and read values from register file
         `PROC_DECODE: begin
@@ -241,21 +228,21 @@ always @ (state) begin
             C[`ir_load] = 1'b0;
             // load now
             C[`sp_load] = opcode == `OP_POP; // sp is decremented before pop
-            // selections
+
             // r1_sel_1: rs by default (0), push - r1 (1)
             C[`r1_sel_1] = opcode == `OP_PUSH;
+
             // wa_sel_1: R-type - write to rd (0), I-type - write to rt (1)
             C[`wa_sel_1] = opcode != `OP_RTYPE;
             // wa_sel_2: pop - write to r0 (0), jal - write to r31 (1)
             C[`wa_sel_2] = opcode == `OP_JAL;
-            // wa_sel_3: push or pop - wa_sel_2, else wa_sel_1
             // wa_sel_3: wa_sel_2 if push or pop or jal (0), else wa_sel_1 (1)
             C[`wa_sel_3] = ~(opcode == `OP_PUSH || opcode == `OP_POP || opcode == `OP_JAL);
+
             // pc_sel_1: jr - jump to address in rs (0), else pc_inc (1)
             C[`pc_sel_1] = ~(opcode == `OP_RTYPE && funct == `FN_JR);
             // pc_sel_2: pc_sel_1 by default (0), beq, bne - branch if equal or not equal (1)
-            // TODO: this should only be selected if the condition is met
-            // pc_sel_2 = opcode == `OP_BEQ || opcode == `OP_BNE;
+            // pc_sel_2 is set after EXE because it depends on ZERO
             // pc_sel_3: jmp or jal - jump to address (0), else pc_sel_2 (1)
             C[`pc_sel_3] = ~(opcode == `OP_JMP || opcode == `OP_JAL);
 
@@ -296,31 +283,32 @@ always @ (state) begin
             end
             // op1_sel_1: r1 by default (0), push or pop - sp (1)
             C[`op1_sel_1] = opcode == `OP_PUSH || opcode == `OP_POP;
+
             // op2_sel_1: const 1 (for inc/dec) (0), shamt for sll/srl (1)
             C[`op2_sel_1] = opcode == `OP_RTYPE && (funct == `FN_SLL || funct == `FN_SRL);
             // op2_sel_2: imm_zx for logical and/or (0), imm_sx otherise (1)
             // ('nor' not availble in I-type)
             C[`op2_sel_2] = ~(opcode == `OP_ANDI || opcode == `OP_ORI);
             // op2_sel_3: op2_sel_2 for I-type (0), op2_sel_1 for R-type shift or inc/dec (1)
-            // inc/dec is push or pop
+            // (inc/dec is for sp with push or pop)
             C[`op2_sel_3] = opcode == `OP_RTYPE || opcode == `OP_PUSH || opcode == `OP_POP;
             // op2_sel_4: op2_sel_3 for I-type (except beq, bne) or R-type shift or inc/dec (0), else r2 (1)
             // i.e. r2 if R-type (except sll/srl), or bne/beq
             C[`op2_sel_4] = opcode == `OP_RTYPE && ~(funct == `FN_SLL || funct == `FN_SRL)
                     || opcode == `OP_BEQ || opcode == `OP_BNE;
 
-            // wd_sel_1: alu_out or DATA_IN
             // wd_sel_1: alu_out by default (0), DATA_IN for lw or pop (1)
             C[`wd_sel_1] = opcode == `OP_LW || opcode == `OP_POP;
             // wd_sel_2: wd_sel_1 by default (0), imm_zx_lsb for lui (1)
             C[`wd_sel_2] = opcode == `OP_LUI;
             // wd_sel_3: pc_inc for jal (0), else wd_sel_2 (1)
             C[`wd_sel_3] = ~(opcode == `OP_JAL);
-            // ma_sel_1: alu_out for lw or sw, sp for push or pop
+
             // ma_sel_1: alu_out for lw or sw (0), sp for push or pop (1)
             C[`ma_sel_1] = opcode == `OP_PUSH || opcode == `OP_POP;
             // ma_sel_2: 0 for every memory access instruction (lw, sw, push, pop), 1 for fetch
             C[`ma_sel_2] = 1'b0;
+
             // md_sel_1: r2 for sw (0), r1 for push (1)
             C[`md_sel_1] = opcode == `OP_PUSH;
         end
@@ -387,7 +375,7 @@ always @ (negedge RST) begin
     state_sel = 3'bxxx;
 end
 
-// TBD - take action on each +ve edge of clock
+// take action on each +ve edge of clock
 always @ (posedge CLK) begin
     case (state_sel)
         `PROC_FETCH: state_sel = `PROC_DECODE;
