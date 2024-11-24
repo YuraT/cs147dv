@@ -30,8 +30,8 @@ wire [`DATA_INDEX_LIMIT:0] MEM_DATA_OUT, MEM_DATA_IN;
 
 // reset
 reg RST;
-//integer t1=1, t2=1, t3=1, t4=1, t5=1, t6=1;
-integer t1=0, t2=0, t3=0, t4=0, t5=0, t6=1;
+integer t1=1, t2=1, t3=1, t4=1, t5=1, t6=1;
+//integer t1=0, t2=0, t3=0, t4=0, t5=0, t6=1;
 
 // Clock generator instance
 CLK_GENERATOR clk_gen_inst(.CLK(CLK));
